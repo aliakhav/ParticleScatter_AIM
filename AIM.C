@@ -47,6 +47,7 @@ void ParticleScattering::DeAllocSize()
 	T_direct.resize(0);
 	T_all_direct.resize(0);
 	Ci_FFT.resize(0);
+	Ci_2_FFT.resize(0);
 	BucketParticle_ndx.resize(0);
 	Lambda.resize(0);
 	Grid_den.resize(0);
@@ -79,27 +80,28 @@ void ParticleScattering::ReadParticle()
 //	Particle_X[0] = 0.05*dx; Particle_X[1] = D-0.05*dx; Particle_X[2] = 0.05*dx; Particle_X[3] = 0.95*dx; Particle_X[4] = 0.05*dx; Particle_X[5] = D-0.95*dx;
 //	Particle_Y[0] = 0.05*dx; Particle_Y[1] = D-0.05*dx; Particle_Y[2] = D-0.95*dx; Particle_Y[3] = D-0.95*dx; Particle_Y[4] = 0.95*dx; Particle_Y[5] = D-0.95*dx;
 
-	Particle_X[0] = 0.05; Particle_X[1] = 0.5; Particle_X[2] = 0.95; Particle_X[3] = 0.05; Particle_X[4] = 0.5; Particle_X[5] = 0.95;
-	Particle_X[6] = 0.05; Particle_X[7] = 0.5; Particle_X[8] = 0.95;
-	Particle_Y[0] = 0.05; Particle_Y[1] = 0.05; Particle_Y[2] = 0.05; Particle_Y[3] = 0.5; Particle_Y[4] = 0.5; Particle_Y[5] = 0.5;
-	Particle_Y[6] = 0.95; Particle_Y[7] = 0.95; Particle_Y[8] = 0.95;
-
-	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7; Particle_den[3] = 0.09; Particle_den[4] = 0.26; Particle_den[5] = 0.49;
-	Particle_den[6] = 0.67; Particle_den[7] = 0.87; Particle_den[8] = 0.33;
-//	char filename[50];
-//	sprintf(filename, "Particle%d.dat", Np);
+//	Particle_X[0] = 0.05; Particle_X[1] = 0.5; Particle_X[2] = 0.95; Particle_X[3] = 0.05; Particle_X[4] = 0.5; Particle_X[5] = 0.95;
+//	Particle_X[6] = 0.05; Particle_X[7] = 0.5; Particle_X[8] = 0.95;
+//	Particle_Y[0] = 0.05; Particle_Y[1] = 0.05; Particle_Y[2] = 0.05; Particle_Y[3] = 0.5; Particle_Y[4] = 0.5; Particle_Y[5] = 0.5;
+//	Particle_Y[6] = 0.95; Particle_Y[7] = 0.95; Particle_Y[8] = 0.95;
 //
-//	FILE *sample = fopen(filename, "r");
-//
-//	int ip;
-//	for (ip = 0; ip < Np; ip++){
-//		fscanf(sample, "%f ", &Particle_X[ip]);
-//		fscanf(sample, "%f ", &Particle_Y[ip]);
-//		fscanf(sample, "%f\n", &Particle_den[ip]);
-//	}
-//		fscanf(sample, "%f %f %f\n", &Particle_X[ip], &Particle_Y[ip], &Particle_den[ip]);
+//	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7; Particle_den[3] = 0.09; Particle_den[4] = 0.26; Particle_den[5] = 0.49;
+//	Particle_den[6] = 0.67; Particle_den[7] = 0.87; Particle_den[8] = 0.33;
 
-//	fclose(sample);
+	char filename[50];
+	sprintf(filename, "Particle%d.dat", Np);
+
+	FILE *sample = fopen(filename, "r");
+
+	int ip;
+	for (ip = 0; ip < Np; ip++){
+		fscanf(sample, "%f ", &Particle_X[ip]);
+		fscanf(sample, "%f ", &Particle_Y[ip]);
+		fscanf(sample, "%f\n", &Particle_den[ip]);
+	}
+		fscanf(sample, "%f %f %f\n", &Particle_X[ip], &Particle_Y[ip], &Particle_den[ip]);
+
+	fclose(sample);
 }
 
 //Direct Method
@@ -442,12 +444,13 @@ double ParticleScattering::ErrorEstimate()
 int main() {
 
 
-	for (int iter = 11; iter < 101; iter++) {
+//	for (int iter = 7; iter < 31; iter++) {
 
+		int iter = 33;
 		ParticleScattering test;
 		test.N = iter;
-		test.Np = 9;
-		test.D = 1.0;
+		test.Np = 10000;
+		test.D = 100.0;
 
 		test.AllocSize();
 		test.ReadParticle();
@@ -465,16 +468,16 @@ int main() {
 		test.MapBack2Particles();
 		double ER = test.ErrorEstimate();
 
-		printf("-------------------------\n");
-//		for (int i = 0; i < test.Np; i++)
-//			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
+		printf("--------------------------------------\n");
+		for (int i = 0; i < test.Np; i++)
+			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
 
 		printf("Size = %d\tError = %g\n", iter, ER);
 
 
 		test.DeAllocSize();
 
-	}
+//	}
 
 
 	return 0;

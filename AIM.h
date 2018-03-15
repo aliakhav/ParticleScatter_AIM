@@ -28,9 +28,9 @@ public:
 	double time_dft;
 
 public:
-	std::vector<double> Particle_den;
-	std::vector<double> Particle_X;
-	std::vector<double> Particle_Y;
+	std::vector<float> Particle_den;
+	std::vector<float> Particle_X;
+	std::vector<float> Particle_Y;
 	std::vector<std::vector<int> > BucketParticle_ndx;
 	std::vector<double> Kernel_Dir;
 	std::vector<double> Phi_Dir;
