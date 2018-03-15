@@ -74,9 +74,18 @@ void ParticleScattering::ReadParticle()
 	int Nb = N-1;
 	double dx = D / Nb;
 
-	Particle_X[0] = 0.05*dx; Particle_X[1] = D - 0.05*dx;
-	Particle_Y[0] = 0.05*dx; Particle_Y[1] = D - 0.05*dx;
-	Particle_den[0] = 1.0; Particle_den[1] = 0.4;
+//	Particle_X[0] = 0.0001; Particle_X[1] = 0.9999;
+//	Particle_Y[0] = 0.0001; Particle_Y[1] = 0.9999;
+//	Particle_X[0] = 0.05*dx; Particle_X[1] = D-0.05*dx; Particle_X[2] = 0.05*dx; Particle_X[3] = 0.95*dx; Particle_X[4] = 0.05*dx; Particle_X[5] = D-0.95*dx;
+//	Particle_Y[0] = 0.05*dx; Particle_Y[1] = D-0.05*dx; Particle_Y[2] = D-0.95*dx; Particle_Y[3] = D-0.95*dx; Particle_Y[4] = 0.95*dx; Particle_Y[5] = D-0.95*dx;
+
+	Particle_X[0] = 0.05; Particle_X[1] = 0.5; Particle_X[2] = 0.95; Particle_X[3] = 0.05; Particle_X[4] = 0.5; Particle_X[5] = 0.95;
+	Particle_X[6] = 0.05; Particle_X[7] = 0.5; Particle_X[8] = 0.95;
+	Particle_Y[0] = 0.05; Particle_Y[1] = 0.05; Particle_Y[2] = 0.05; Particle_Y[3] = 0.5; Particle_Y[4] = 0.5; Particle_Y[5] = 0.5;
+	Particle_Y[6] = 0.95; Particle_Y[7] = 0.95; Particle_Y[8] = 0.95;
+
+	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7; Particle_den[3] = 0.09; Particle_den[4] = 0.26; Particle_den[5] = 0.49;
+	Particle_den[6] = 0.67; Particle_den[7] = 0.87; Particle_den[8] = 0.33;
 //	char filename[50];
 //	sprintf(filename, "Particle%d.dat", Np);
 //
@@ -164,6 +173,7 @@ void ParticleScattering::FindBucket()
 	int Nb = N-1;
 	double dx = D / Nb;
 	int temp;
+	double xG, yG;
 
 
 
@@ -172,7 +182,23 @@ void ParticleScattering::FindBucket()
 
 	for (int ip = 0; ip < Np; ip++)
 	{
-		temp = (int) (floor(Particle_X[ip]/dx) + Nb * floor(Particle_Y[ip]/dx));
+		xG = Particle_X[ip]/dx;
+		yG = Particle_Y[ip]/dx;
+
+		if (xG < 0.0) {
+			xG = 0.0;
+		}
+		if (yG < 0.0) {
+			yG = 0.0;
+		}
+		if (xG >= Nb) {
+			xG = Nb-1;
+		}
+		if (yG >= Nb) {
+			yG = Nb-1;
+		}
+
+		temp = (int) (floor(xG) + Nb * floor(yG));
 		BucketParticle_ndx[temp].push_back(ip);
 
 		// Initialization for Phi on particles
@@ -415,35 +441,41 @@ double ParticleScattering::ErrorEstimate()
 
 int main() {
 
-	ParticleScattering test;
-	test.N = 11;
-	test.Np = 2;
-	test.D = 1.0;
 
-	test.AllocSize();
-	test.ReadParticle();
-	test.ComputeKernel();
-	test.ComputeDirect2();
+	for (int iter = 11; iter < 101; iter++) {
 
-	test.FindBucket();
-	test.BucketLambda();
+		ParticleScattering test;
+		test.N = iter;
+		test.Np = 9;
+		test.D = 1.0;
 
-	test.ComputeToeplitzUniques();
-	test.ComputeCirculant4fft();
-	test.Gen_zeropadded_X4fft();
-	test.Take_DFT_IDFT();
+		test.AllocSize();
+		test.ReadParticle();
+		test.ComputeKernel();
+		test.ComputeDirect2();
 
-	test.MapBack2Particles();
-	double ER = test.ErrorEstimate();
+		test.FindBucket();
+		test.BucketLambda();
 
-	for (int i = 0; i < test.Np; i++)
-		printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
+		test.ComputeToeplitzUniques();
+		test.ComputeCirculant4fft();
+		test.Gen_zeropadded_X4fft();
+		test.Take_DFT_IDFT();
 
-	printf("Error = %g\n", ER);
+		test.MapBack2Particles();
+		double ER = test.ErrorEstimate();
+
+		printf("-------------------------\n");
+//		for (int i = 0; i < test.Np; i++)
+//			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
+
+		printf("Size = %d\tError = %g\n", iter, ER);
 
 
+		test.DeAllocSize();
 
-	test.DeAllocSize();
+	}
+
 
 	return 0;
 }
