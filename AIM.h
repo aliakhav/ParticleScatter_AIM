@@ -66,6 +66,8 @@ public:
 	void Compute_W_inv();
 	void BucketLambda();
 	void MapBack2Particles();
+	void NearZoneCompute();
+	void Bucket2Bucket(int *iNegh);
 
 	void AllocSize();
 	void ComputeToeplitzUniques();
