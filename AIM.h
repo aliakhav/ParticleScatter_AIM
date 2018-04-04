@@ -48,6 +48,9 @@ public:
 	std::vector<double> X_global_direct;
 	std::vector<double> Y_global_direct;
 
+	std::vector<int> iNeigh;
+	std::vector<double> Near_Ker;
+
 	std::vector<std::vector<double> > Ci_FFT;
 	std::vector<double> Ci_2_FFT;
 	std::vector<double> X_2_FFT;
@@ -67,7 +70,7 @@ public:
 	void BucketLambda();
 	void MapBack2Particles();
 	void NearZoneCompute();
-	void Bucket2Bucket(int *iNegh);
+	void Bucket2Bucket();
 
 	void AllocSize();
 	void ComputeToeplitzUniques();

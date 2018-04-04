@@ -426,11 +426,40 @@ void ParticleScattering::MapBack2Particles()
 	}
 }
 
-void ParticleScattering::Bucket2Bucket(int *iNeigh)
+void ParticleScattering::Bucket2Bucket()
 {
-	for (int iB = 0; iB < iNeigh->size(); iB++)
-	{
+	int tempC, tempN, nCurr, nNeigh;
+	double temp1, temp2;
 
+	// Loop over each Neighboring bucket
+	for (int iB = 0; iB < iNeigh.size(); iB++)
+	{
+		nCurr = BucketParticle_ndx[iNeigh[0]].size();
+		nNeigh = BucketParticle_ndx[iNeigh[iB]].size();
+		Near_Ker.resize(nCurr * nNeigh);
+
+		// Loop over particles assigned to the current bucket
+		for (int ip = 0; ip < nCurr; ip++) {
+
+			tempC = BucketParticle_ndx[iNeigh[0]][ip];
+
+			// Loop over particles assigned to the neighboring bucket
+			for (int ipN = 0; ipN < nNeigh; ipN++) {
+
+				tempN = BucketParticle_ndx[iB][ipN];
+
+				// Computing Direct Kernel for Near Zone
+				if (tempC == tempC) {
+					Near_Ker[ipN+ip*nNeigh] = 0.0;
+				}
+				else {
+					temp1 = Particle_X[ip] - Particle_X[ipN];
+					temp2 = Particle_Y[ip] - Particle_Y[ipN];
+
+					Near_Ker[ipN+ip*nNeigh] = 1.0 / sqrt(temp1*temp1 + temp2*temp2);
+				}
+			}
+		}
 	}
 }
 
@@ -439,7 +468,6 @@ void ParticleScattering::NearZoneCompute()
 
 	int iBuck;
 	double dx = D / (N-1);
-	std::vector<int> iNeigh;
 
 	int jx, jy;
 	// Corner Boundaries
@@ -451,7 +479,7 @@ void ParticleScattering::NearZoneCompute()
 	iNeigh.push_back(1);
 	iNeigh.push_back(N-1);
 	iNeigh.push_back(N);
-	Bucket2Bucket(iNeigh);
+	Bucket2Bucket();
 
 
 	iNeigh.resize(0);
@@ -462,7 +490,7 @@ void ParticleScattering::NearZoneCompute()
 	iNeigh.push_back(jx-1 + (N-1) * jy);
 	iNeigh.push_back(jx + (N-1) * (jy+1));
 	iNeigh.push_back(jx-1 + (N-1) * (jy+1));
-	Bucket2Bucket(iNegh);
+	Bucket2Bucket();
 
 
 	iNeigh.resize(0);
@@ -473,9 +501,9 @@ void ParticleScattering::NearZoneCompute()
 	iNeigh.push_back(jx+1 + (N-1) * jy);
 	iNeigh.push_back(jx+1 + (N-1) * (jy-1));
 	iNeigh.push_back(jx + (N-1) * (jy-1));
+	Bucket2Bucket();
 
 
-	iNeigh.push_back(iBuck);
 	iNeigh.resize(0);
 	jx = N-2; jy = N-2;
 	iBuck = jx + (N-1) * jy;
@@ -484,7 +512,7 @@ void ParticleScattering::NearZoneCompute()
 	iNeigh.push_back(jx-1 + (N-1) * jy);
 	iNeigh.push_back(jx-1 + (N-1) * (jy-1));
 	iNeigh.push_back(jx + (N-1) * (jy-1));
-
+	Bucket2Bucket();
 
 
 	int j;
@@ -502,6 +530,7 @@ void ParticleScattering::NearZoneCompute()
 		iNeigh.push_back(i + (N-1) * (j+1));
 		iNeigh.push_back(i+1 + (N-1) * (j+1));
 		iNeigh.push_back(i-1 + (N-1) * (j+1));
+		Bucket2Bucket();
 
 
 		iNeigh.resize(0);
@@ -513,7 +542,7 @@ void ParticleScattering::NearZoneCompute()
 		iNeigh.push_back(j + (N-1) * (i-1));
 		iNeigh.push_back(j+1 + (N-1) * (i+1));
 		iNeigh.push_back(j+1 + (N-1) * (i-1));
-
+		Bucket2Bucket();
 
 		j = N-2;
 
@@ -526,7 +555,7 @@ void ParticleScattering::NearZoneCompute()
 		iNeigh.push_back(i + (N-1) * (j-1));
 		iNeigh.push_back(i+1 + (N-1) * (j-1));
 		iNeigh.push_back(i-1 + (N-1) * (j-1));
-
+		Bucket2Bucket();
 
 		iNeigh.resize(0);
 		iBuck = j + (N-1) * i;
@@ -537,37 +566,60 @@ void ParticleScattering::NearZoneCompute()
 		iNeigh.push_back(j + (N-1) * (i-1));
 		iNeigh.push_back(j-1 + (N-1) * (i+1));
 		iNeigh.push_back(j-1 + (N-1) * (i-1));
+		Bucket2Bucket();
+
+	}
 
 
+	// Loop over buckets
+	for (int iy = 2; iy < N-2; iy++) {
+		for (int ix = 2; ix < N-2; ix++) {
+
+			iNeigh.resize(0);
+			iBuck = ix + (N-1) * iy;
+
+			iNeigh.push_back(iBuck);
+			iNeigh.push_back(ix+1 + (N-1) * iy);
+			iNeigh.push_back(ix-1 + (N-1) * iy);
+			iNeigh.push_back(ix + (N-1) * (iy+1));
+			iNeigh.push_back(ix + (N-1) * (iy-1));
+			iNeigh.push_back(ix+1 + (N-1) * (iy+1));
+			iNeigh.push_back(ix+1 + (N-1) * (iy-1));
+			iNeigh.push_back(ix-1 + (N-1) * (iy+1));
+			iNeigh.push_back(ix-1 + (N-1) * (iy-1));
+			Bucket2Bucket();
+
+
+		}
 	}
 
 
-	int i;
-	for (int j = 1; j < N-2; j++)
-	{
-		i = 0;
-		iNeigh.resize(0);
-		iBuck = i + (N-1) * j;
-
-		iNeigh.push_back(i+1 + (N-1) * j);
-		iNeigh.push_back(i + (N-1) * (j+1));
-		iNeigh.push_back(i + (N-1) * (j-1));
-		iNeigh.push_back(i+1 + (N-1) * (j+1));
-		iNeigh.push_back(i+1 + (N-1) * (j-1));
-
-
-		i = N-2;
-		iNeigh.resize(0);
-		iBuck = i + (N-1) * j;
-
-		iNeigh.push_back(i-1 + (N-1) * j);
-		iNeigh.push_back(i + (N-1) * (j+1));
-		iNeigh.push_back(i + (N-1) * (j-1));
-		iNeigh.push_back(i-1 + (N-1) * (j+1));
-		iNeigh.push_back(i-1 + (N-1) * (j-1));
-
-
-	}
+//	int i;
+//	for (int j = 1; j < N-2; j++)
+//	{
+//		i = 0;
+//		iNeigh.resize(0);
+//		iBuck = i + (N-1) * j;
+//
+//		iNeigh.push_back(i+1 + (N-1) * j);
+//		iNeigh.push_back(i + (N-1) * (j+1));
+//		iNeigh.push_back(i + (N-1) * (j-1));
+//		iNeigh.push_back(i+1 + (N-1) * (j+1));
+//		iNeigh.push_back(i+1 + (N-1) * (j-1));
+//
+//
+//		i = N-2;
+//		iNeigh.resize(0);
+//		iBuck = i + (N-1) * j;
+//
+//		iNeigh.push_back(i-1 + (N-1) * j);
+//		iNeigh.push_back(i + (N-1) * (j+1));
+//		iNeigh.push_back(i + (N-1) * (j-1));
+//		iNeigh.push_back(i-1 + (N-1) * (j+1));
+//		iNeigh.push_back(i-1 + (N-1) * (j-1));
+//
+//
+//	}
 }
 
 double ParticleScattering::ErrorEstimate()
