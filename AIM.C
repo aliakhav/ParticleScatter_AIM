@@ -537,20 +537,19 @@ void ParticleScattering::Bucket2Bucket()
 			}
 		}
 
-		// Loop over particles assigned to the neighboring bucket
-		for (int ipN = 0; ipN < nNeigh; ipN++) {
+		Two_BucketKernel(iNeighN[iB]-iNeighN[0]);
+		std::vector<double> G_LambdaNear(4*nNeigh,0.0);
 
-			tempN = BucketParticle_ndx[iB][ipN];
+		for (int i = 0; i < 4; i++) {
 
-			for (int i= 0; i < 4; i++) {
+			// Loop over particles assigned to the neighboring bucket
+			for (int ipN = 0; ipN < nNeigh; ipN++) {
+				tempN = BucketParticle_ndx[iB][ipN];
 
+				for (int n = 0; n < 4; n++)
+					G_LambdaNear[nNeigh * i + ipN] += Grid_Ker[4*i + n] * Lambda[n + 4*tempN];
 			}
-
-
-
 		}
-
-
 	}
 }
 
