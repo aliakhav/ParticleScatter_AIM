@@ -36,6 +36,9 @@ void ParticleScattering::AllocSize()
 	Particle_phi.resize(Np);
 
 
+	Pattern_Ker.resize(9);
+
+
 	// Allocating complex vectors
 	CC = ( fftw_complex* ) fftw_malloc( sizeof( fftw_complex ) * 4*N*N );
 	XX  = ( fftw_complex* ) fftw_malloc( sizeof( fftw_complex ) * 4*N*N );
@@ -54,6 +57,8 @@ void ParticleScattering::DeAllocSize()
 	Grid_phi.resize(0);
 	Particle_phi.resize(0);
 	
+	Pattern_Ker.resize(0);
+
 	fftw_destroy_plan(plan_XX);
 	fftw_destroy_plan(plan_YY);
 	fftw_destroy_plan(plan_INV);
@@ -395,9 +400,7 @@ void ParticleScattering::MapBack2Particles()
 			Grid_phi[j+i*N] = creal(Res_DFT[j+i*2*N]) / (4*ns);
 
 	std::vector<double> temp_Phi;
-	std::vector<double> temp_Q(4, 1.0);
 	int iBuck, iNode, temp;
-	double dx = D / (N-1), x0, y0, tmp;
 
 	// Loop over buckets
 	for (int iy = 0; iy < N-1; iy++) {
@@ -405,8 +408,6 @@ void ParticleScattering::MapBack2Particles()
 
 			iBuck = ix + (N-1) * iy;
 			iNode = ix + N * iy;
-			x0 = ix * dx;
-			y0 = iy * dx;
 
 			temp_Phi.resize(0);
 			for (int itmp = 0; itmp < 4; itmp++)
@@ -423,6 +424,81 @@ void ParticleScattering::MapBack2Particles()
 				Particle_phi[temp] += Lambda[4*temp+3] * Grid_phi[iNode+N+1];
 			}
 		}
+	}
+}
+
+void ParticleScattering::CreateTwo_BucketKerPatterns()
+{
+	double X_pattern[9][4] = {
+		{ 0.0, 1.0, 0.0, 1.0 }, { 1.0, 2.0, 1.0, 2.0 }, { 1.0, 2.0, 1.0, 2.0 },
+		{ 0.0, 1.0, 0.0, 1.0 }, { -1.0, 0.0, -1.0, 0.0 }, { -1.0, 0.0, -1.0, 0.0 },
+		{ -1.0, 0.0, -1.0, 0.0 }, { 0.0, 1.0, 0.0, 1.0 }, { 1.0, 2.0, 1.0, 2.0 } };
+
+	double Y_pattern[9][4] = {
+		{ 0.0, 0.0, 1.0, 1.0 }, { 0.0, 0.0, 1.0, 1.0 }, { 1.0, 1.0, 2.0, 2.0 },
+		{ 1.0, 1.0, 2.0, 2.0 }, { 1.0, 1.0, 2.0, 2.0 }, { 0.0, 0.0, 1.0, 1.0 },
+		{ -1.0, -1.0, 0.0, 0.0 }, { -1.0, -1.0, 0.0, 0.0 }, { -1.0, -1.0, 0.0, 0.0 } };
+
+	double dx = D / (N-1);
+	double temp1, temp2;
+
+	for (int iPat = 0; iPat < 9; iPat++){
+		for (int j = 0; j < 4; j++) {
+			for (int i = 0; i < 4; i++) {
+
+				temp1 = X_pattern[0][i] - X_pattern[iPat][j];
+				temp2 = Y_pattern[0][i] - Y_pattern[iPat][j];
+
+				if (temp1 == 0.0 && temp2 == 0.0) {
+					Pattern_Ker[iPat].push_back(0.0);
+				}
+				else {
+					Pattern_Ker[iPat].push_back(1.0 / (dx * sqrt(temp1*temp1 + temp2*temp2)));
+				}
+
+			}
+		}
+	}
+}
+
+void ParticleScattering::Assign_NeighKernel(int ID2)
+{
+	for (int i = 0; i < 16; i++)
+		Grid_Ker[i] = Pattern_Ker[ID2][i];
+}
+
+void ParticleScattering::Two_BucketKernel(int ID1) {
+	switch (ID1) {
+	case 0:
+		Assign_NeighKernel(0);
+		break;
+	case 1:
+		Assign_NeighKernel(1);
+		break;
+	case N+1:
+		Assign_NeighKernel(2);
+		break;
+	case N:
+		Assign_NeighKernel(3);
+		break;
+	case N-1:
+		Assign_NeighKernel(4);
+		break;
+	case -1:
+		Assign_NeighKernel(5);
+		break;
+	case -N-1:
+		Assign_NeighKernel(6);
+		break;
+	case -N:
+		Assign_NeighKernel(7);
+		break;
+	case -N+1:
+		Assign_NeighKernel(8);
+		break;
+	default:
+		printf("Error");
+		break;
 	}
 }
 
@@ -460,58 +536,71 @@ void ParticleScattering::Bucket2Bucket()
 				}
 			}
 		}
+
+		// Loop over particles assigned to the neighboring bucket
+		for (int ipN = 0; ipN < nNeigh; ipN++) {
+
+			tempN = BucketParticle_ndx[iB][ipN];
+
+			for (int i= 0; i < 4; i++) {
+
+			}
+
+
+
+		}
+
+
 	}
 }
 
 void ParticleScattering::NearZoneCompute()
 {
 
+	CreateTwo_BucketKerPatterns();
+
 	int iBuck;
 	double dx = D / (N-1);
 
 	int jx, jy;
 	// Corner Boundaries
-	iNeigh.resize(0);
+	iNeigh.resize(0); iNeighN.resize(0);
 	jx = 0; jy = 0;
-	iBuck = jx + (N-1) * jy;
 
-	iNeigh.push_back(0);
-	iNeigh.push_back(1);
-	iNeigh.push_back(N-1);
-	iNeigh.push_back(N);
+	iNeigh.push_back(0); iNeighN.push_back(0);
+	iNeigh.push_back(1); iNeighN.push_back(1);
+	iNeigh.push_back(N-1); iNeighN.push_back(N);
+	iNeigh.push_back(N); iNeighN.push_back(N+1);
 	Bucket2Bucket();
 
 
-	iNeigh.resize(0);
+	iNeigh.resize(0); iNeighN.resize(0);
 	jx = N-2; jy = 0;
-	iBuck = jx + (N-1) * jy;
 
-	iNeigh.push_back(iBuck);
-	iNeigh.push_back(jx-1 + (N-1) * jy);
-	iNeigh.push_back(jx + (N-1) * (jy+1));
-	iNeigh.push_back(jx-1 + (N-1) * (jy+1));
+	iNeigh.push_back(jx + (N-1) * jy); iNeighN.push_back(iNeigh[0] + jy);
+	iNeigh.push_back(jx-1 + (N-1) * jy); iNeighN.push_back(iNeigh[1] + jy);
+	iNeigh.push_back(jx + (N-1) * (jy+1)); iNeighN.push_back(iNeigh[2] + jy+1);
+	iNeigh.push_back(jx-1 + (N-1) * (jy+1)); iNeighN.push_back(iNeigh[3] + jy+1);
 	Bucket2Bucket();
 
 
-	iNeigh.resize(0);
+	iNeigh.resize(0); iNeighN.resize(0);
 	jx = 0; jy = N-2;
-	iBuck = jx + (N-1) * jy;
 
-	iNeigh.push_back(iBuck);
-	iNeigh.push_back(jx+1 + (N-1) * jy);
-	iNeigh.push_back(jx+1 + (N-1) * (jy-1));
-	iNeigh.push_back(jx + (N-1) * (jy-1));
+	iNeigh.push_back(jx + (N-1) * jy);  iNeighN.push_back(iNeigh[0] + jy);
+	iNeigh.push_back(jx+1 + (N-1) * jy); iNeighN.push_back(iNeigh[1] + jy);
+	iNeigh.push_back(jx+1 + (N-1) * (jy-1)); iNeighN.push_back(iNeigh[2] + jy-1);
+	iNeigh.push_back(jx + (N-1) * (jy-1)); iNeighN.push_back(iNeigh[3] + jy-1);
 	Bucket2Bucket();
 
 
-	iNeigh.resize(0);
+	iNeigh.resize(0); iNeighN.resize(0);
 	jx = N-2; jy = N-2;
-	iBuck = jx + (N-1) * jy;
 
-	iNeigh.push_back(iBuck);
-	iNeigh.push_back(jx-1 + (N-1) * jy);
-	iNeigh.push_back(jx-1 + (N-1) * (jy-1));
-	iNeigh.push_back(jx + (N-1) * (jy-1));
+	iNeigh.push_back(jx + (N-1) * jy); iNeighN.push_back(iNeigh[0] + jy);
+	iNeigh.push_back(jx-1 + (N-1) * jy); iNeighN.push_back(iNeigh[1] + jy);
+	iNeigh.push_back(jx-1 + (N-1) * (jy-1)); iNeighN.push_back(iNeigh[2] + jy-1);
+	iNeigh.push_back(jx + (N-1) * (jy-1)); iNeighN.push_back(iNeigh[3] + jy-1);
 	Bucket2Bucket();
 
 
@@ -521,51 +610,49 @@ void ParticleScattering::NearZoneCompute()
 	{
 		j = 0;
 
-		iNeigh.resize(0);
-		iBuck = i + (N-1) * j;
+		iNeigh.resize(0); iNeighN.resize(0);
 
-		iNeigh.push_back(iBuck);
-		iNeigh.push_back(i+1 + (N-1) * j);
-		iNeigh.push_back(i-1 + (N-1) * j);
-		iNeigh.push_back(i + (N-1) * (j+1));
-		iNeigh.push_back(i+1 + (N-1) * (j+1));
-		iNeigh.push_back(i-1 + (N-1) * (j+1));
+		iNeigh.push_back(i + (N-1) * j); iNeighN.push_back(iNeigh[0] + j);
+		iNeigh.push_back(i+1 + (N-1) * j); iNeighN.push_back(iNeigh[1] + j);
+		iNeigh.push_back(i-1 + (N-1) * j); iNeighN.push_back(iNeigh[2] + j);
+		iNeigh.push_back(i + (N-1) * (j+1)); iNeighN.push_back(iNeigh[3] + j+1);
+		iNeigh.push_back(i+1 + (N-1) * (j+1)); iNeighN.push_back(iNeigh[4] + j+1);
+		iNeigh.push_back(i-1 + (N-1) * (j+1)); iNeighN.push_back(iNeigh[5] + j+1);
 		Bucket2Bucket();
 
 
-		iNeigh.resize(0);
-		iBuck = j + (N-1) * i;
+		iNeigh.resize(0); iNeighN.resize(0);
 
-		iNeigh.push_back(iBuck);
-		iNeigh.push_back(j+1 + (N-1) * i);
-		iNeigh.push_back(j + (N-1) * (i+1));
-		iNeigh.push_back(j + (N-1) * (i-1));
-		iNeigh.push_back(j+1 + (N-1) * (i+1));
-		iNeigh.push_back(j+1 + (N-1) * (i-1));
+		iNeigh.push_back(j + (N-1) * i); iNeighN.push_back(iNeigh[0] + i);
+		iNeigh.push_back(j+1 + (N-1) * i); iNeighN.push_back(iNeigh[1] + i);
+		iNeigh.push_back(j + (N-1) * (i+1)); iNeighN.push_back(iNeigh[2] + i+1);
+		iNeigh.push_back(j + (N-1) * (i-1)); iNeighN.push_back(iNeigh[3] + i-1);
+		iNeigh.push_back(j+1 + (N-1) * (i+1)); iNeighN.push_back(iNeigh[4] + i+1);
+		iNeigh.push_back(j+1 + (N-1) * (i-1)); iNeighN.push_back(iNeigh[5] + i-1);
 		Bucket2Bucket();
+
 
 		j = N-2;
 
-		iNeigh.resize(0);
-		iBuck = i + (N-1) * j;
+		iNeigh.resize(0); iNeighN.resize(0);
 
-		iNeigh.push_back(iBuck);
-		iNeigh.push_back(i+1 + (N-1) * j);
-		iNeigh.push_back(i-1 + (N-1) * j);
-		iNeigh.push_back(i + (N-1) * (j-1));
-		iNeigh.push_back(i+1 + (N-1) * (j-1));
-		iNeigh.push_back(i-1 + (N-1) * (j-1));
+		iNeigh.push_back(i + (N-1) * j); iNeighN.push_back(iNeigh[0] + j);
+		iNeigh.push_back(i+1 + (N-1) * j); iNeighN.push_back(iNeigh[1] + j);
+		iNeigh.push_back(i-1 + (N-1) * j); iNeighN.push_back(iNeigh[2] + j);
+		iNeigh.push_back(i + (N-1) * (j-1)); iNeighN.push_back(iNeigh[3] + j-1);
+		iNeigh.push_back(i+1 + (N-1) * (j-1)); iNeighN.push_back(iNeigh[4] + j-1);
+		iNeigh.push_back(i-1 + (N-1) * (j-1)); iNeighN.push_back(iNeigh[5] + j-1);
 		Bucket2Bucket();
 
-		iNeigh.resize(0);
-		iBuck = j + (N-1) * i;
 
-		iNeigh.push_back(iBuck);
-		iNeigh.push_back(j-1 + (N-1) * i);
-		iNeigh.push_back(j + (N-1) * (i+1));
-		iNeigh.push_back(j + (N-1) * (i-1));
-		iNeigh.push_back(j-1 + (N-1) * (i+1));
-		iNeigh.push_back(j-1 + (N-1) * (i-1));
+		iNeigh.resize(0); iNeighN.resize(0);
+
+		iNeigh.push_back(j + (N-1) * i); iNeighN.push_back(iNeigh[0] + i);
+		iNeigh.push_back(j-1 + (N-1) * i);  iNeighN.push_back(iNeigh[1] + i);
+		iNeigh.push_back(j + (N-1) * (i+1)); iNeighN.push_back(iNeigh[2] + i+1);
+		iNeigh.push_back(j + (N-1) * (i-1)); iNeighN.push_back(iNeigh[3] + i-1);
+		iNeigh.push_back(j-1 + (N-1) * (i+1)); iNeighN.push_back(iNeigh[4] + i+1);
+		iNeigh.push_back(j-1 + (N-1) * (i-1)); iNeighN.push_back(iNeigh[5] + i-1);
 		Bucket2Bucket();
 
 	}
@@ -575,20 +662,18 @@ void ParticleScattering::NearZoneCompute()
 	for (int iy = 2; iy < N-2; iy++) {
 		for (int ix = 2; ix < N-2; ix++) {
 
-			iNeigh.resize(0);
-			iBuck = ix + (N-1) * iy;
+			iNeigh.resize(0); iNeighN.resize(0);
 
-			iNeigh.push_back(iBuck);
-			iNeigh.push_back(ix+1 + (N-1) * iy);
-			iNeigh.push_back(ix-1 + (N-1) * iy);
-			iNeigh.push_back(ix + (N-1) * (iy+1));
-			iNeigh.push_back(ix + (N-1) * (iy-1));
-			iNeigh.push_back(ix+1 + (N-1) * (iy+1));
-			iNeigh.push_back(ix+1 + (N-1) * (iy-1));
-			iNeigh.push_back(ix-1 + (N-1) * (iy+1));
-			iNeigh.push_back(ix-1 + (N-1) * (iy-1));
+			iNeigh.push_back(ix + (N-1) * iy); iNeighN.push_back(iNeigh[0] + iy);
+			iNeigh.push_back(ix+1 + (N-1) * iy); iNeighN.push_back(iNeigh[1] + iy);
+			iNeigh.push_back(ix-1 + (N-1) * iy); iNeighN.push_back(iNeigh[2] + iy);
+			iNeigh.push_back(ix + (N-1) * (iy+1)); iNeighN.push_back(iNeigh[3] + iy+1);
+			iNeigh.push_back(ix + (N-1) * (iy-1)); iNeighN.push_back(iNeigh[4] + iy-1);
+			iNeigh.push_back(ix+1 + (N-1) * (iy+1)); iNeighN.push_back(iNeigh[5] + iy+1);
+			iNeigh.push_back(ix+1 + (N-1) * (iy-1)); iNeighN.push_back(iNeigh[6] + iy-1);
+			iNeigh.push_back(ix-1 + (N-1) * (iy+1)); iNeighN.push_back(iNeigh[7] + iy+1);
+			iNeigh.push_back(ix-1 + (N-1) * (iy-1)); iNeighN.push_back(iNeigh[8] + iy-1);
 			Bucket2Bucket();
-
 
 		}
 	}

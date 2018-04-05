@@ -49,7 +49,10 @@ public:
 	std::vector<double> Y_global_direct;
 
 	std::vector<int> iNeigh;
+	std::vector<int> iNeighN;
 	std::vector<double> Near_Ker;
+	std::vector<std::vector<double> > Pattern_Ker;
+	std::vector<double> Grid_Ker;
 
 	std::vector<std::vector<double> > Ci_FFT;
 	std::vector<double> Ci_2_FFT;
@@ -71,6 +74,9 @@ public:
 	void MapBack2Particles();
 	void NearZoneCompute();
 	void Bucket2Bucket();
+	void CreateTwo_BucketKerPatterns();
+	void Two_BucketKernel(int ID1);
+	void Assign_NeighKernel(int ID2);
 
 	void AllocSize();
 	void ComputeToeplitzUniques();
