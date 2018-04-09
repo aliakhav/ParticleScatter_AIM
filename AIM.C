@@ -468,38 +468,58 @@ void ParticleScattering::Assign_NeighKernel(int ID2)
 }
 
 void ParticleScattering::Two_BucketKernel(int ID1) {
-	switch (ID1) {
-	case 0:
-		Assign_NeighKernel(0);
-		break;
-	case 1:
-		Assign_NeighKernel(1);
-		break;
-	case N+1:
-		Assign_NeighKernel(2);
-		break;
-	case N:
-		Assign_NeighKernel(3);
-		break;
-	case N-1:
-		Assign_NeighKernel(4);
-		break;
-	case -1:
-		Assign_NeighKernel(5);
-		break;
-	case -N-1:
-		Assign_NeighKernel(6);
-		break;
-	case -N:
-		Assign_NeighKernel(7);
-		break;
-	case -N+1:
-		Assign_NeighKernel(8);
-		break;
-	default:
-		printf("Error");
-		break;
-	}
+
+	if (ID1 == 0)
+	Assign_NeighKernel(0);
+	else if (ID1 == 1)
+	Assign_NeighKernel(1);
+	else if (ID1 == N+1)
+	Assign_NeighKernel(2);
+	else if (ID1 == N)
+	Assign_NeighKernel(3);
+	else if (ID1 == N-1)
+	Assign_NeighKernel(4);
+	else if (ID1 == -1)
+	Assign_NeighKernel(5);
+	else if (ID1 == -N-1)
+	Assign_NeighKernel(6);
+	else if (ID1 == -N)
+	Assign_NeighKernel(7);
+	else if (ID1 == -N+1)
+	Assign_NeighKernel(8);
+
+	// switch (ID1) {
+	// case 0:
+	// Assign_NeighKernel(0);
+	// break;
+	// case 1:
+	// Assign_NeighKernel(1);
+	// break;
+	// case N+1:
+	// Assign_NeighKernel(2);
+	// break;
+	// case N:
+	// Assign_NeighKernel(3);
+	// break;
+	// case N-1:
+	// Assign_NeighKernel(4);
+	// break;
+	// case -1:
+	// Assign_NeighKernel(5);
+	// break;
+	// case -N-1:
+	// Assign_NeighKernel(6);
+	// break;
+	// case -N:
+	// Assign_NeighKernel(7);
+	// break;
+	// case -N+1:
+	// Assign_NeighKernel(8);
+	// break;
+	// default:
+	// printf("Error");
+	// break;
+	// }
 }
 
 void ParticleScattering::Bucket2Bucket()
@@ -522,10 +542,10 @@ void ParticleScattering::Bucket2Bucket()
 			// Loop over particles assigned to the neighboring bucket
 			for (int ipN = 0; ipN < nNeigh; ipN++) {
 
-				tempN = BucketParticle_ndx[iB][ipN];
+				tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
 
 				// Computing Direct Kernel for Near Zone
-				if (tempC == tempC) {
+				if (tempC == tempN) {
 					Near_Ker[ipN+ip*nNeigh] = 0.0;
 				}
 				else {
@@ -538,18 +558,32 @@ void ParticleScattering::Bucket2Bucket()
 		}
 
 		Two_BucketKernel(iNeighN[iB]-iNeighN[0]);
-		std::vector<double> G_LambdaNear(4*nNeigh,0.0);
+		std::vector<double> G_L(4*nNeigh,0.0);
 
 		for (int i = 0; i < 4; i++) {
 
 			// Loop over particles assigned to the neighboring bucket
 			for (int ipN = 0; ipN < nNeigh; ipN++) {
-				tempN = BucketParticle_ndx[iB][ipN];
+				tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
 
 				for (int n = 0; n < 4; n++)
-					G_LambdaNear[nNeigh * i + ipN] += Grid_Ker[4*i + n] * Lambda[n + 4*tempN];
+					G_L[nNeigh * i + ipN] += Grid_Ker[4*i + n] * Lambda[n + 4*tempN];
 			}
 		}
+
+//		std::vector<double> LT_G_L(nCurr * nNeigh,0.0);
+
+		for (int ipC = 0; ipC < nCurr; ipC++) {
+			tempC = BucketParticle_ndx[iNeigh[0]][ipC];
+
+			// Loop over particles assigned to the neighboring bucket
+			for (int ipN = 0; ipN < nNeigh; ipN++) {
+
+				for (int n = 0; n < 4; n++)
+					Near_Ker[nNeigh * ipC + ipN] -= G_L[nCurr*ipC + n] * Lambda[n + 4*tempC];
+			}
+		}
+
 	}
 }
 
