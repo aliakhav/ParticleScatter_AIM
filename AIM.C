@@ -464,7 +464,7 @@ void ParticleScattering::CreateTwo_BucketKerPatterns()
 void ParticleScattering::Assign_NeighKernel(int ID2)
 {
 	for (int i = 0; i < 16; i++)
-		Grid_Ker[i] = Pattern_Ker[ID2][i];
+		Grid_Ker.push_back(Pattern_Ker[ID2][i]);
 }
 
 void ParticleScattering::Two_BucketKernel(int ID1) {
@@ -549,8 +549,8 @@ void ParticleScattering::Bucket2Bucket()
 					Near_Ker[ipN+ip*nNeigh] = 0.0;
 				}
 				else {
-					temp1 = Particle_X[ip] - Particle_X[ipN];
-					temp2 = Particle_Y[ip] - Particle_Y[ipN];
+					temp1 = Particle_X[tempC] - Particle_X[tempN];
+					temp2 = Particle_Y[tempC] - Particle_Y[tempN];
 
 					Near_Ker[ipN+ip*nNeigh] = 1.0 / sqrt(temp1*temp1 + temp2*temp2);
 				}
@@ -598,7 +598,6 @@ void ParticleScattering::Bucket2Bucket()
 
 			}
 		}
-
 	}
 }
 
@@ -795,6 +794,9 @@ int main() {
 		test.Take_DFT_IDFT();
 
 		test.MapBack2Particles();
+
+		test.NearZoneCompute();
+
 		double ER = test.ErrorEstimate();
 
 		printf("--------------------------------------\n");
