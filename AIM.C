@@ -584,6 +584,21 @@ void ParticleScattering::Bucket2Bucket()
 			}
 		}
 
+
+
+		for (int ipC = 0; ipC < nCurr; ipC++) {
+
+			tempC = BucketParticle_ndx[iNeigh[0]][ipC];
+
+			for (int ipN = 0; ipN < nNeigh; ipN++) {
+
+				tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
+
+				Particle_phi[tempC] += Near_Ker[nNeigh * ipC + ipN] * Particle_den[tempN];
+
+			}
+		}
+
 	}
 }
 
