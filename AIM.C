@@ -80,7 +80,13 @@ void ParticleScattering::ReadParticle()
 	int Nb = N-1;
 	double dx = D / Nb;
 
-//	Particle_X[0] = 0.0001; Particle_X[1] = 0.9999;
+	Particle_X[0] = 0.1*dx; Particle_Y[0] = 0.2*dx;
+	Particle_X[1] = 0.4*dx; Particle_Y[1] = 0.8*dx;
+	Particle_X[2] = 0.1*dx; Particle_Y[2] = 1.9*dx;
+	Particle_X[3] = 0.9*dx; Particle_Y[3] = 1.1*dx;
+//	Particle_X[4] = 0.1*dx; Particle_Y[4] = 0.2*dx;
+//	Particle_X[5] = 0.1*dx; Particle_Y[5] = 0.2*dx;
+//	Particle_X[6] = 0.1*dx; Particle_Y[6] = 0.2*dx;
 //	Particle_Y[0] = 0.0001; Particle_Y[1] = 0.9999;
 //	Particle_X[0] = 0.05*dx; Particle_X[1] = D-0.05*dx; Particle_X[2] = 0.05*dx; Particle_X[3] = 0.95*dx; Particle_X[4] = 0.05*dx; Particle_X[5] = D-0.95*dx;
 //	Particle_Y[0] = 0.05*dx; Particle_Y[1] = D-0.05*dx; Particle_Y[2] = D-0.95*dx; Particle_Y[3] = D-0.95*dx; Particle_Y[4] = 0.95*dx; Particle_Y[5] = D-0.95*dx;
@@ -89,24 +95,37 @@ void ParticleScattering::ReadParticle()
 //	Particle_X[6] = 0.05; Particle_X[7] = 0.5; Particle_X[8] = 0.95;
 //	Particle_Y[0] = 0.05; Particle_Y[1] = 0.05; Particle_Y[2] = 0.05; Particle_Y[3] = 0.5; Particle_Y[4] = 0.5; Particle_Y[5] = 0.5;
 //	Particle_Y[6] = 0.95; Particle_Y[7] = 0.95; Particle_Y[8] = 0.95;
+
+	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7; Particle_den[3] = 0.09; //Particle_den[4] = 0.26; Particle_den[5] = 0.49;
+//	Particle_den[6] = 0.67;
+
+//	Particle_X[0] = 0.0001; Particle_X[1] = 0.9999;
+//	Particle_Y[0] = 0.0001; Particle_Y[1] = 0.9999;
+//	Particle_X[0] = 0.05*dx; Particle_X[1] = D-0.05*dx; Particle_X[2] = 0.05*dx; Particle_X[3] = 0.95*dx; Particle_X[4] = 0.05*dx; Particle_X[5] = D-0.95*dx;
+//	Particle_Y[0] = 0.05*dx; Particle_Y[1] = D-0.05*dx; Particle_Y[2] = D-0.95*dx; Particle_Y[3] = D-0.95*dx; Particle_Y[4] = 0.95*dx; Particle_Y[5] = D-0.95*dx;
+//
+//	Particle_X[0] = 0.05; Particle_X[1] = 0.5; Particle_X[2] = 0.95; Particle_X[3] = 0.05; Particle_X[4] = 0.5; Particle_X[5] = 0.95;
+//	Particle_X[6] = 0.05; Particle_X[7] = 0.5; Particle_X[8] = 0.95;
+//	Particle_Y[0] = 0.05; Particle_Y[1] = 0.05; Particle_Y[2] = 0.05; Particle_Y[3] = 0.5; Particle_Y[4] = 0.5; Particle_Y[5] = 0.5;
+//	Particle_Y[6] = 0.95; Particle_Y[7] = 0.95; Particle_Y[8] = 0.95;
 //
 //	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7; Particle_den[3] = 0.09; Particle_den[4] = 0.26; Particle_den[5] = 0.49;
 //	Particle_den[6] = 0.67; Particle_den[7] = 0.87; Particle_den[8] = 0.33;
 
-	char filename[50];
-	sprintf(filename, "Particle%d.dat", Np);
-
-	FILE *sample = fopen(filename, "r");
-
-	int ip;
-	for (ip = 0; ip < Np; ip++){
-		fscanf(sample, "%f ", &Particle_X[ip]);
-		fscanf(sample, "%f ", &Particle_Y[ip]);
-		fscanf(sample, "%f\n", &Particle_den[ip]);
-	}
-		fscanf(sample, "%f %f %f\n", &Particle_X[ip], &Particle_Y[ip], &Particle_den[ip]);
-
-	fclose(sample);
+//	char filename[50];
+//	sprintf(filename, "Particle%d.dat", Np);
+//
+//	FILE *sample = fopen(filename, "r");
+//
+//	int ip;
+//	for (ip = 0; ip < Np; ip++){
+//		fscanf(sample, "%f ", &Particle_X[ip]);
+//		fscanf(sample, "%f ", &Particle_Y[ip]);
+//		fscanf(sample, "%f\n", &Particle_den[ip]);
+//	}
+//		fscanf(sample, "%f %f %f\n", &Particle_X[ip], &Particle_Y[ip], &Particle_den[ip]);
+//
+//	fclose(sample);
 }
 
 //Direct Method
@@ -463,6 +482,8 @@ void ParticleScattering::CreateTwo_BucketKerPatterns()
 
 void ParticleScattering::Assign_NeighKernel(int ID2)
 {
+	Grid_Ker.resize(0);
+
 	for (int i = 0; i < 16; i++)
 		Grid_Ker.push_back(Pattern_Ker[ID2][i]);
 }
@@ -487,39 +508,6 @@ void ParticleScattering::Two_BucketKernel(int ID1) {
 	Assign_NeighKernel(7);
 	else if (ID1 == -N+1)
 	Assign_NeighKernel(8);
-
-	// switch (ID1) {
-	// case 0:
-	// Assign_NeighKernel(0);
-	// break;
-	// case 1:
-	// Assign_NeighKernel(1);
-	// break;
-	// case N+1:
-	// Assign_NeighKernel(2);
-	// break;
-	// case N:
-	// Assign_NeighKernel(3);
-	// break;
-	// case N-1:
-	// Assign_NeighKernel(4);
-	// break;
-	// case -1:
-	// Assign_NeighKernel(5);
-	// break;
-	// case -N-1:
-	// Assign_NeighKernel(6);
-	// break;
-	// case -N:
-	// Assign_NeighKernel(7);
-	// break;
-	// case -N+1:
-	// Assign_NeighKernel(8);
-	// break;
-	// default:
-	// printf("Error");
-	// break;
-	// }
 }
 
 void ParticleScattering::Bucket2Bucket()
@@ -527,75 +515,92 @@ void ParticleScattering::Bucket2Bucket()
 	int tempC, tempN, nCurr, nNeigh;
 	double temp1, temp2;
 
-	// Loop over each Neighboring bucket
-	for (int iB = 0; iB < iNeigh.size(); iB++)
+	nCurr = BucketParticle_ndx[iNeigh[0]].size();
+
+	if (nCurr > 0)
 	{
-		nCurr = BucketParticle_ndx[iNeigh[0]].size();
-		nNeigh = BucketParticle_ndx[iNeigh[iB]].size();
-		Near_Ker.resize(nCurr * nNeigh);
+		// Loop over each Neighboring bucket
+		for (int iB = 0; iB < iNeigh.size(); iB++)
+		{
+			nNeigh = BucketParticle_ndx[iNeigh[iB]].size();
 
-		// Loop over particles assigned to the current bucket
-		for (int ip = 0; ip < nCurr; ip++) {
+			if (nNeigh > 0)
+			{
+				// Computing Direct Kernel for Near Zone between Current Bucket and Neighboring Bucket
+				Near_Ker.resize(nCurr * nNeigh);
 
-			tempC = BucketParticle_ndx[iNeigh[0]][ip];
+				// Loop over particles assigned to the current bucket
+				for (int ip = 0; ip < nCurr; ip++)
+				{
+					tempC = BucketParticle_ndx[iNeigh[0]][ip];
 
-			// Loop over particles assigned to the neighboring bucket
-			for (int ipN = 0; ipN < nNeigh; ipN++) {
+					// Loop over particles assigned to the neighboring bucket
+					for (int ipN = 0; ipN < nNeigh; ipN++)
+					{
+						tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
 
-				tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
+						if (tempC == tempN) {
+							Near_Ker[ipN+ip*nNeigh] = 0.0;
+						}
+						else {
+							temp1 = Particle_X[tempC] - Particle_X[tempN];
+							temp2 = Particle_Y[tempC] - Particle_Y[tempN];
 
-				// Computing Direct Kernel for Near Zone
-				if (tempC == tempN) {
-					Near_Ker[ipN+ip*nNeigh] = 0.0;
+							Near_Ker[ipN+ip*nNeigh] = 1.0 / sqrt(temp1*temp1 + temp2*temp2);
+						}
+					}
 				}
-				else {
-					temp1 = Particle_X[tempC] - Particle_X[tempN];
-					temp2 = Particle_Y[tempC] - Particle_Y[tempN];
 
-					Near_Ker[ipN+ip*nNeigh] = 1.0 / sqrt(temp1*temp1 + temp2*temp2);
+				// Computing Kernel on grid (4*4 matrix) for Near Zone between Current Bucket and Neighboring Bucket
+				Two_BucketKernel(iNeighN[iB]-iNeighN[0]);
+
+				// Computing multiplication of Kernel on grid (4*4 matrix) and Lambda matrix for Neighboring
+				std::vector<double> G_L(4*nNeigh,0.0);
+
+				for (int i = 0; i < 4; i++)
+				{
+					// Loop over particles assigned to the neighboring bucket
+					for (int ipN = 0; ipN < nNeigh; ipN++)
+					{
+						tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
+
+						for (int n = 0; n < 4; n++)
+							G_L[nNeigh * i + ipN] += Grid_Ker[4*i + n] * Lambda[n + 4*tempN];
+					}
 				}
-			}
-		}
-
-		Two_BucketKernel(iNeighN[iB]-iNeighN[0]);
-		std::vector<double> G_L(4*nNeigh,0.0);
-
-		for (int i = 0; i < 4; i++) {
-
-			// Loop over particles assigned to the neighboring bucket
-			for (int ipN = 0; ipN < nNeigh; ipN++) {
-				tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
-
-				for (int n = 0; n < 4; n++)
-					G_L[nNeigh * i + ipN] += Grid_Ker[4*i + n] * Lambda[n + 4*tempN];
-			}
-		}
-
-//		std::vector<double> LT_G_L(nCurr * nNeigh,0.0);
-
-		for (int ipC = 0; ipC < nCurr; ipC++) {
-			tempC = BucketParticle_ndx[iNeigh[0]][ipC];
-
-			// Loop over particles assigned to the neighboring bucket
-			for (int ipN = 0; ipN < nNeigh; ipN++) {
-
-				for (int n = 0; n < 4; n++)
-					Near_Ker[nNeigh * ipC + ipN] -= G_L[nCurr*ipC + n] * Lambda[n + 4*tempC];
-			}
-		}
 
 
+				// Computing part of Far zone kernel associated with Current Bucket and the Neighboring Bucket
+				// multiplication of Lambda transpose matrix to the pre-computed "Kernel on grid * Neighbor_Lambda"
+				// Computing Corrected part of the Global Far Kernel associated with the near zone between current and neighboring buckets
+				for (int ipC = 0; ipC < nCurr; ipC++)
+				{
+					tempC = BucketParticle_ndx[iNeigh[0]][ipC];
 
-		for (int ipC = 0; ipC < nCurr; ipC++) {
+					// Loop over particles assigned to the neighboring bucket
+					for (int ipN = 0; ipN < nNeigh; ipN++)
+					{
 
-			tempC = BucketParticle_ndx[iNeigh[0]][ipC];
+						for (int n = 0; n < 4; n++)
+							Near_Ker[nNeigh * ipC + ipN] -= G_L[nCurr*ipC + n] * Lambda[n + 4*tempC];
+					}
+				}
 
-			for (int ipN = 0; ipN < nNeigh; ipN++) {
 
-				tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
+				// Fixing part of the Potential vector affected by incorrect computations due to including near zone interactions inside the global far kernel
+				for (int ipC = 0; ipC < nCurr; ipC++)
+				{
 
-				Particle_phi[tempC] += Near_Ker[nNeigh * ipC + ipN] * Particle_den[tempN];
+					tempC = BucketParticle_ndx[iNeigh[0]][ipC];
 
+					for (int ipN = 0; ipN < nNeigh; ipN++)
+					{
+
+						tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
+
+						Particle_phi[tempC] += Near_Ker[nNeigh * ipC + ipN] * Particle_den[tempN];
+					}
+				}
 			}
 		}
 	}
@@ -605,9 +610,6 @@ void ParticleScattering::NearZoneCompute()
 {
 
 	CreateTwo_BucketKerPatterns();
-
-	int iBuck;
-	double dx = D / (N-1);
 
 	int jx, jy;
 	// Corner Boundaries
@@ -724,34 +726,6 @@ void ParticleScattering::NearZoneCompute()
 
 		}
 	}
-
-
-//	int i;
-//	for (int j = 1; j < N-2; j++)
-//	{
-//		i = 0;
-//		iNeigh.resize(0);
-//		iBuck = i + (N-1) * j;
-//
-//		iNeigh.push_back(i+1 + (N-1) * j);
-//		iNeigh.push_back(i + (N-1) * (j+1));
-//		iNeigh.push_back(i + (N-1) * (j-1));
-//		iNeigh.push_back(i+1 + (N-1) * (j+1));
-//		iNeigh.push_back(i+1 + (N-1) * (j-1));
-//
-//
-//		i = N-2;
-//		iNeigh.resize(0);
-//		iBuck = i + (N-1) * j;
-//
-//		iNeigh.push_back(i-1 + (N-1) * j);
-//		iNeigh.push_back(i + (N-1) * (j+1));
-//		iNeigh.push_back(i + (N-1) * (j-1));
-//		iNeigh.push_back(i-1 + (N-1) * (j+1));
-//		iNeigh.push_back(i-1 + (N-1) * (j-1));
-//
-//
-//	}
 }
 
 double ParticleScattering::ErrorEstimate()
@@ -774,11 +748,11 @@ int main() {
 
 //	for (int iter = 7; iter < 31; iter++) {
 
-		int iter = 33;
+		int iter = 11;
 		ParticleScattering test;
 		test.N = iter;
-		test.Np = 10000;
-		test.D = 100.0;
+		test.Np = 4;
+		test.D = 10.0;
 
 		test.AllocSize();
 		test.ReadParticle();
@@ -795,9 +769,17 @@ int main() {
 
 		test.MapBack2Particles();
 
+		double ER = test.ErrorEstimate();
+
+		printf("--------------------------------------\n");
+		for (int i = 0; i < test.Np; i++)
+			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
+
+		printf("Size = %d\tError = %g\n", iter, ER);
+
 		test.NearZoneCompute();
 
-		double ER = test.ErrorEstimate();
+		ER = test.ErrorEstimate();
 
 		printf("--------------------------------------\n");
 		for (int i = 0; i < test.Np; i++)
