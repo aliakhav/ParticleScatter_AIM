@@ -80,10 +80,20 @@ void ParticleScattering::ReadParticle()
 	int Nb = N-1;
 	double dx = D / Nb;
 
+//	double co = 0.5*0.5*0.5*0.5;
+//	co *= co;
+//	co *= co;
+//	co *= co;
+//	co *= co;
+//	Particle_X[0] = co*dx; Particle_Y[0] = co*dx;
+//	Particle_X[1] = D-co*dx; Particle_Y[1] = D-co*dx;
+
+//	Particle_X[0] = 0.0; Particle_Y[0] = dx;
+//	Particle_X[1] = dx; Particle_Y[1] = 0.0;
 	Particle_X[0] = 0.1*dx; Particle_Y[0] = 0.2*dx;
 	Particle_X[1] = 0.4*dx; Particle_Y[1] = 0.8*dx;
-	Particle_X[2] = 0.1*dx; Particle_Y[2] = 1.9*dx;
-	Particle_X[3] = 0.9*dx; Particle_Y[3] = 1.1*dx;
+//	Particle_X[2] = 0.1*dx; Particle_Y[2] = 1.9*dx;
+//	Particle_X[3] = 0.9*dx; Particle_Y[3] = 1.1*dx;
 //	Particle_X[4] = 0.1*dx; Particle_Y[4] = 0.2*dx;
 //	Particle_X[5] = 0.1*dx; Particle_Y[5] = 0.2*dx;
 //	Particle_X[6] = 0.1*dx; Particle_Y[6] = 0.2*dx;
@@ -96,7 +106,7 @@ void ParticleScattering::ReadParticle()
 //	Particle_Y[0] = 0.05; Particle_Y[1] = 0.05; Particle_Y[2] = 0.05; Particle_Y[3] = 0.5; Particle_Y[4] = 0.5; Particle_Y[5] = 0.5;
 //	Particle_Y[6] = 0.95; Particle_Y[7] = 0.95; Particle_Y[8] = 0.95;
 
-	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7; Particle_den[3] = 0.09; //Particle_den[4] = 0.26; Particle_den[5] = 0.49;
+	Particle_den[0] = 1.0; Particle_den[1] = 0.4; //Particle_den[2] = 0.7; Particle_den[3] = 0.09; //Particle_den[4] = 0.26; Particle_den[5] = 0.49;
 //	Particle_den[6] = 0.67;
 
 //	Particle_X[0] = 0.0001; Particle_X[1] = 0.9999;
@@ -465,16 +475,16 @@ void ParticleScattering::CreateTwo_BucketKerPatterns()
 		for (int j = 0; j < 4; j++) {
 			for (int i = 0; i < 4; i++) {
 
-				temp1 = X_pattern[0][i] - X_pattern[iPat][j];
-				temp2 = Y_pattern[0][i] - Y_pattern[iPat][j];
+				temp1 = X_pattern[0][j] - X_pattern[iPat][i];
+				temp2 = Y_pattern[0][j] - Y_pattern[iPat][i];
 
 				if (temp1 == 0.0 && temp2 == 0.0) {
 					Pattern_Ker[iPat].push_back(0.0);
 				}
 				else {
 					Pattern_Ker[iPat].push_back(1.0 / (dx * sqrt(temp1*temp1 + temp2*temp2)));
+//					Pattern_Ker[iPat].push_back(1.0 / sqrt(temp1*temp1 + temp2*temp2));
 				}
-
 			}
 		}
 	}
@@ -482,14 +492,12 @@ void ParticleScattering::CreateTwo_BucketKerPatterns()
 
 void ParticleScattering::Assign_NeighKernel(int ID2)
 {
-	Grid_Ker.resize(0);
-
 	for (int i = 0; i < 16; i++)
-		Grid_Ker.push_back(Pattern_Ker[ID2][i]);
+		Grid_Ker[i] = Pattern_Ker[ID2][i];
 }
 
-void ParticleScattering::Two_BucketKernel(int ID1) {
-
+void ParticleScattering::Two_BucketKernel(int ID1)
+{
 	if (ID1 == 0)
 	Assign_NeighKernel(0);
 	else if (ID1 == 1)
@@ -595,7 +603,6 @@ void ParticleScattering::Bucket2Bucket()
 
 					for (int ipN = 0; ipN < nNeigh; ipN++)
 					{
-
 						tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
 
 						Particle_phi[tempC] += Near_Ker[nNeigh * ipC + ipN] * Particle_den[tempN];
@@ -610,6 +617,7 @@ void ParticleScattering::NearZoneCompute()
 {
 
 	CreateTwo_BucketKerPatterns();
+	Grid_Ker.resize(16);
 
 	int jx, jy;
 	// Corner Boundaries
@@ -707,9 +715,9 @@ void ParticleScattering::NearZoneCompute()
 	}
 
 
-	// Loop over buckets
-	for (int iy = 2; iy < N-2; iy++) {
-		for (int ix = 2; ix < N-2; ix++) {
+	// Loop over inner buckets
+	for (int iy = 1; iy < N-2; iy++) {
+		for (int ix = 1; ix < N-2; ix++) {
 
 			iNeigh.resize(0); iNeighN.resize(0);
 
@@ -751,7 +759,7 @@ int main() {
 		int iter = 11;
 		ParticleScattering test;
 		test.N = iter;
-		test.Np = 4;
+		test.Np = 2;
 		test.D = 10.0;
 
 		test.AllocSize();
@@ -777,15 +785,15 @@ int main() {
 
 		printf("Size = %d\tError = %g\n", iter, ER);
 
-		test.NearZoneCompute();
-
-		ER = test.ErrorEstimate();
-
-		printf("--------------------------------------\n");
-		for (int i = 0; i < test.Np; i++)
-			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
-
-		printf("Size = %d\tError = %g\n", iter, ER);
+//		test.NearZoneCompute();
+//
+//		ER = test.ErrorEstimate();
+//
+//		printf("--------------------------------------\n");
+//		for (int i = 0; i < test.Np; i++)
+//			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
+//
+//		printf("Size = %d\tError = %g\n", iter, ER);
 
 
 		test.DeAllocSize();
