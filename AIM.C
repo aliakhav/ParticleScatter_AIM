@@ -90,8 +90,34 @@ void ParticleScattering::ReadParticle()
 
 //	Particle_X[0] = 0.0; Particle_Y[0] = dx;
 //	Particle_X[1] = dx; Particle_Y[1] = 0.0;
-	Particle_X[0] = 0.1*dx; Particle_Y[0] = 0.2*dx;
-	Particle_X[1] = 0.4*dx; Particle_Y[1] = 0.8*dx;
+//	Particle_X[0] = 1.1*dx; Particle_Y[0] = 1.2*dx;
+//	Particle_X[1] = 1.4*dx; Particle_Y[1] = 1.8*dx;
+//	Particle_X[0] = 0.1*dx+dx; Particle_Y[0] = 0.2*dx+dx;
+//	Particle_X[1] = 0.4*dx+dx; Particle_Y[1] = 0.8*dx+dx;
+//	Particle_X[0] = 0.1*dx+dx; Particle_Y[0] = 0.2*dx;
+//	Particle_X[1] = 0.4*dx+dx; Particle_Y[1] = 0.8*dx;
+//	Particle_X[0] = 0.1*dx; Particle_Y[0] = 0.2*dx+dx;
+//	Particle_X[1] = 0.4*dx; Particle_Y[1] = 0.8*dx+dx;
+
+//	Particle_X[0] = 0.98*dx; Particle_Y[0] = 1.87*dx;
+//	Particle_X[1] = 0.98*dx; Particle_Y[1] = 0.1*dx;
+//	Particle_X[2] = 1.98*dx; Particle_Y[2] = 1.7*dx;
+//	Particle_X[3] = 1.8*dx; Particle_Y[3] = 0.3*dx;
+//	Particle_X[4] = 1.5*dx; Particle_Y[4] = 0.6*dx;
+//	Particle_X[5] = 1.2*dx; Particle_Y[5] = 0.8*dx;
+
+//	Particle_X[0] = 0.8*dx; Particle_Y[0] = 0.6*dx;
+//	Particle_X[1] = 0.4*dx; Particle_Y[1] = 1.1*dx;
+//	Particle_X[2] = 0.6*dx; Particle_Y[2] = 2.2*dx;
+//	Particle_X[3] = 1.4*dx; Particle_Y[3] = 0.5*dx;
+//	Particle_X[4] = 1.8*dx; Particle_Y[4] = 1.6*dx;
+//	Particle_X[5] = 1.5*dx; Particle_Y[5] = 2.7*dx;
+//	Particle_X[6] = 2.1*dx; Particle_Y[6] = 0.7*dx;
+//	Particle_X[7] = 2.3*dx; Particle_Y[7] = 1.9*dx;
+//	Particle_X[8] = 2.9*dx; Particle_Y[8] = 2.8*dx;
+
+//	Particle_X[0] = 0.0; Particle_Y[0] = dx;
+//	Particle_X[1] = dx; Particle_Y[1] = 0.0;
 //	Particle_X[2] = 0.1*dx; Particle_Y[2] = 1.9*dx;
 //	Particle_X[3] = 0.9*dx; Particle_Y[3] = 1.1*dx;
 //	Particle_X[4] = 0.1*dx; Particle_Y[4] = 0.2*dx;
@@ -106,8 +132,9 @@ void ParticleScattering::ReadParticle()
 //	Particle_Y[0] = 0.05; Particle_Y[1] = 0.05; Particle_Y[2] = 0.05; Particle_Y[3] = 0.5; Particle_Y[4] = 0.5; Particle_Y[5] = 0.5;
 //	Particle_Y[6] = 0.95; Particle_Y[7] = 0.95; Particle_Y[8] = 0.95;
 
-	Particle_den[0] = 1.0; Particle_den[1] = 0.4; //Particle_den[2] = 0.7; Particle_den[3] = 0.09; //Particle_den[4] = 0.26; Particle_den[5] = 0.49;
-//	Particle_den[6] = 0.67;
+//	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7;
+//	Particle_den[3] = 0.09; Particle_den[4] = 0.26; Particle_den[5] = 0.49;
+//	Particle_den[6] = 0.67; Particle_den[7] = 0.43; Particle_den[8] = 0.89;
 
 //	Particle_X[0] = 0.0001; Particle_X[1] = 0.9999;
 //	Particle_Y[0] = 0.0001; Particle_Y[1] = 0.9999;
@@ -122,20 +149,20 @@ void ParticleScattering::ReadParticle()
 //	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7; Particle_den[3] = 0.09; Particle_den[4] = 0.26; Particle_den[5] = 0.49;
 //	Particle_den[6] = 0.67; Particle_den[7] = 0.87; Particle_den[8] = 0.33;
 
-//	char filename[50];
-//	sprintf(filename, "Particle%d.dat", Np);
-//
-//	FILE *sample = fopen(filename, "r");
-//
-//	int ip;
-//	for (ip = 0; ip < Np; ip++){
-//		fscanf(sample, "%f ", &Particle_X[ip]);
-//		fscanf(sample, "%f ", &Particle_Y[ip]);
-//		fscanf(sample, "%f\n", &Particle_den[ip]);
-//	}
-//		fscanf(sample, "%f %f %f\n", &Particle_X[ip], &Particle_Y[ip], &Particle_den[ip]);
-//
-//	fclose(sample);
+	char filename[50];
+	sprintf(filename, "Particle%d.dat", Np);
+
+	FILE *sample = fopen(filename, "r");
+
+	int ip;
+	for (ip = 0; ip < Np; ip++){
+		fscanf(sample, "%f ", &Particle_X[ip]);
+		fscanf(sample, "%f ", &Particle_Y[ip]);
+		fscanf(sample, "%f\n", &Particle_den[ip]);
+	}
+		fscanf(sample, "%f %f %f\n", &Particle_X[ip], &Particle_Y[ip], &Particle_den[ip]);
+
+	fclose(sample);
 }
 
 //Direct Method
@@ -565,16 +592,14 @@ void ParticleScattering::Bucket2Bucket()
 				// Computing multiplication of Kernel on grid (4*4 matrix) and Lambda matrix for Neighboring
 				std::vector<double> G_L(4*nNeigh,0.0);
 
-				for (int i = 0; i < 4; i++)
+				// Loop over particles assigned to the neighboring bucket
+				for (int ipN = 0; ipN < nNeigh; ipN++)
 				{
-					// Loop over particles assigned to the neighboring bucket
-					for (int ipN = 0; ipN < nNeigh; ipN++)
-					{
-						tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
+					tempN = BucketParticle_ndx[iNeigh[iB]][ipN];
 
+					for (int i = 0; i < 4; i++)
 						for (int n = 0; n < 4; n++)
-							G_L[nNeigh * i + ipN] += Grid_Ker[4*i + n] * Lambda[n + 4*tempN];
-					}
+							G_L[4 * ipN + i] += Grid_Ker[4*i + n] * Lambda[n + 4*tempN];
 				}
 
 
@@ -587,18 +612,14 @@ void ParticleScattering::Bucket2Bucket()
 
 					// Loop over particles assigned to the neighboring bucket
 					for (int ipN = 0; ipN < nNeigh; ipN++)
-					{
-
 						for (int n = 0; n < 4; n++)
-							Near_Ker[nNeigh * ipC + ipN] -= G_L[nCurr*ipC + n] * Lambda[n + 4*tempC];
-					}
+							Near_Ker[nNeigh * ipC + ipN] -= Lambda[4*tempC + n] * G_L[n + 4*ipN];
 				}
 
 
 				// Fixing part of the Potential vector affected by incorrect computations due to including near zone interactions inside the global far kernel
 				for (int ipC = 0; ipC < nCurr; ipC++)
 				{
-
 					tempC = BucketParticle_ndx[iNeigh[0]][ipC];
 
 					for (int ipN = 0; ipN < nNeigh; ipN++)
@@ -756,11 +777,11 @@ int main() {
 
 //	for (int iter = 7; iter < 31; iter++) {
 
-		int iter = 11;
+		int iter = 33;
 		ParticleScattering test;
 		test.N = iter;
-		test.Np = 2;
-		test.D = 10.0;
+		test.Np = 10000;
+		test.D = 100.0;
 
 		test.AllocSize();
 		test.ReadParticle();
@@ -785,15 +806,15 @@ int main() {
 
 		printf("Size = %d\tError = %g\n", iter, ER);
 
-//		test.NearZoneCompute();
-//
-//		ER = test.ErrorEstimate();
-//
-//		printf("--------------------------------------\n");
-//		for (int i = 0; i < test.Np; i++)
-//			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
-//
-//		printf("Size = %d\tError = %g\n", iter, ER);
+		test.NearZoneCompute();
+
+		ER = test.ErrorEstimate();
+
+		printf("--------------------------------------\n");
+		for (int i = 0; i < test.Np; i++)
+			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
+
+		printf("Size = %d\tError = %g\n", iter, ER);
 
 
 		test.DeAllocSize();
