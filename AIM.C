@@ -5,8 +5,6 @@ ParticleScattering::ParticleScattering()
 	N = 1;
 	Np = 1;
 	D = 1.0;
-	time_dir = 0.0;
-	time_dft = 0.0;
 
 	// Allocating complex vectors
 	CC = ( fftw_complex* ) fftw_malloc( sizeof( fftw_complex ) * 2 );
@@ -80,75 +78,6 @@ void ParticleScattering::ReadParticle()
 	int Nb = N-1;
 	double dx = D / Nb;
 
-//	double co = 0.5*0.5*0.5*0.5;
-//	co *= co;
-//	co *= co;
-//	co *= co;
-//	co *= co;
-//	Particle_X[0] = co*dx; Particle_Y[0] = co*dx;
-//	Particle_X[1] = D-co*dx; Particle_Y[1] = D-co*dx;
-
-//	Particle_X[0] = 0.0; Particle_Y[0] = dx;
-//	Particle_X[1] = dx; Particle_Y[1] = 0.0;
-//	Particle_X[0] = 1.1*dx; Particle_Y[0] = 1.2*dx;
-//	Particle_X[1] = 1.4*dx; Particle_Y[1] = 1.8*dx;
-//	Particle_X[0] = 0.1*dx+dx; Particle_Y[0] = 0.2*dx+dx;
-//	Particle_X[1] = 0.4*dx+dx; Particle_Y[1] = 0.8*dx+dx;
-//	Particle_X[0] = 0.1*dx+dx; Particle_Y[0] = 0.2*dx;
-//	Particle_X[1] = 0.4*dx+dx; Particle_Y[1] = 0.8*dx;
-//	Particle_X[0] = 0.1*dx; Particle_Y[0] = 0.2*dx+dx;
-//	Particle_X[1] = 0.4*dx; Particle_Y[1] = 0.8*dx+dx;
-
-//	Particle_X[0] = 0.98*dx; Particle_Y[0] = 1.87*dx;
-//	Particle_X[1] = 0.98*dx; Particle_Y[1] = 0.1*dx;
-//	Particle_X[2] = 1.98*dx; Particle_Y[2] = 1.7*dx;
-//	Particle_X[3] = 1.8*dx; Particle_Y[3] = 0.3*dx;
-//	Particle_X[4] = 1.5*dx; Particle_Y[4] = 0.6*dx;
-//	Particle_X[5] = 1.2*dx; Particle_Y[5] = 0.8*dx;
-
-//	Particle_X[0] = 0.8*dx; Particle_Y[0] = 0.6*dx;
-//	Particle_X[1] = 0.4*dx; Particle_Y[1] = 1.1*dx;
-//	Particle_X[2] = 0.6*dx; Particle_Y[2] = 2.2*dx;
-//	Particle_X[3] = 1.4*dx; Particle_Y[3] = 0.5*dx;
-//	Particle_X[4] = 1.8*dx; Particle_Y[4] = 1.6*dx;
-//	Particle_X[5] = 1.5*dx; Particle_Y[5] = 2.7*dx;
-//	Particle_X[6] = 2.1*dx; Particle_Y[6] = 0.7*dx;
-//	Particle_X[7] = 2.3*dx; Particle_Y[7] = 1.9*dx;
-//	Particle_X[8] = 2.9*dx; Particle_Y[8] = 2.8*dx;
-
-//	Particle_X[0] = 0.0; Particle_Y[0] = dx;
-//	Particle_X[1] = dx; Particle_Y[1] = 0.0;
-//	Particle_X[2] = 0.1*dx; Particle_Y[2] = 1.9*dx;
-//	Particle_X[3] = 0.9*dx; Particle_Y[3] = 1.1*dx;
-//	Particle_X[4] = 0.1*dx; Particle_Y[4] = 0.2*dx;
-//	Particle_X[5] = 0.1*dx; Particle_Y[5] = 0.2*dx;
-//	Particle_X[6] = 0.1*dx; Particle_Y[6] = 0.2*dx;
-//	Particle_Y[0] = 0.0001; Particle_Y[1] = 0.9999;
-//	Particle_X[0] = 0.05*dx; Particle_X[1] = D-0.05*dx; Particle_X[2] = 0.05*dx; Particle_X[3] = 0.95*dx; Particle_X[4] = 0.05*dx; Particle_X[5] = D-0.95*dx;
-//	Particle_Y[0] = 0.05*dx; Particle_Y[1] = D-0.05*dx; Particle_Y[2] = D-0.95*dx; Particle_Y[3] = D-0.95*dx; Particle_Y[4] = 0.95*dx; Particle_Y[5] = D-0.95*dx;
-
-//	Particle_X[0] = 0.05; Particle_X[1] = 0.5; Particle_X[2] = 0.95; Particle_X[3] = 0.05; Particle_X[4] = 0.5; Particle_X[5] = 0.95;
-//	Particle_X[6] = 0.05; Particle_X[7] = 0.5; Particle_X[8] = 0.95;
-//	Particle_Y[0] = 0.05; Particle_Y[1] = 0.05; Particle_Y[2] = 0.05; Particle_Y[3] = 0.5; Particle_Y[4] = 0.5; Particle_Y[5] = 0.5;
-//	Particle_Y[6] = 0.95; Particle_Y[7] = 0.95; Particle_Y[8] = 0.95;
-
-//	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7;
-//	Particle_den[3] = 0.09; Particle_den[4] = 0.26; Particle_den[5] = 0.49;
-//	Particle_den[6] = 0.67; Particle_den[7] = 0.43; Particle_den[8] = 0.89;
-
-//	Particle_X[0] = 0.0001; Particle_X[1] = 0.9999;
-//	Particle_Y[0] = 0.0001; Particle_Y[1] = 0.9999;
-//	Particle_X[0] = 0.05*dx; Particle_X[1] = D-0.05*dx; Particle_X[2] = 0.05*dx; Particle_X[3] = 0.95*dx; Particle_X[4] = 0.05*dx; Particle_X[5] = D-0.95*dx;
-//	Particle_Y[0] = 0.05*dx; Particle_Y[1] = D-0.05*dx; Particle_Y[2] = D-0.95*dx; Particle_Y[3] = D-0.95*dx; Particle_Y[4] = 0.95*dx; Particle_Y[5] = D-0.95*dx;
-//
-//	Particle_X[0] = 0.05; Particle_X[1] = 0.5; Particle_X[2] = 0.95; Particle_X[3] = 0.05; Particle_X[4] = 0.5; Particle_X[5] = 0.95;
-//	Particle_X[6] = 0.05; Particle_X[7] = 0.5; Particle_X[8] = 0.95;
-//	Particle_Y[0] = 0.05; Particle_Y[1] = 0.05; Particle_Y[2] = 0.05; Particle_Y[3] = 0.5; Particle_Y[4] = 0.5; Particle_Y[5] = 0.5;
-//	Particle_Y[6] = 0.95; Particle_Y[7] = 0.95; Particle_Y[8] = 0.95;
-//
-//	Particle_den[0] = 1.0; Particle_den[1] = 0.4; Particle_den[2] = 0.7; Particle_den[3] = 0.09; Particle_den[4] = 0.26; Particle_den[5] = 0.49;
-//	Particle_den[6] = 0.67; Particle_den[7] = 0.87; Particle_den[8] = 0.33;
-
 	char filename[50];
 	sprintf(filename, "Particle%d.dat", Np);
 
@@ -188,34 +117,6 @@ void ParticleScattering::ComputeKernel()
 	}
 }
 void ParticleScattering::ComputeDirect()
-{
-    double alpha = 1.0, beta = 0.0;
-    char xx = 'n';
-    const int m = N*N, n = N*N, lda = N*N, incx = N*N, incy = N*N;
-
-    double *tmpT= new double[m*n];
-    double *tmpX= new double[m];
-    double *tmpY= new double[m];
-
-    for (int i = 0; i < m*n; i++)
-    	tmpT[i]=T_global_direct[i];
-
-    for (int i = 0; i < m; i++)
-    {
-    	tmpX[i]=X_global_direct[i];
-//    	tmpY[i]=Y_global_direct[i];
-    }
-
-    dgemv_(&xx, &m, &n, &alpha, tmpT, &lda, tmpX, &incx, &beta, tmpY, &incy);
-
-    for (int i = 0; i < m; i++)
-    	Y_global_direct.push_back(tmpY[i]);
-
-    delete[] tmpT;
-    delete[] tmpX;
-    delete[] tmpY;
-}
-void ParticleScattering::ComputeDirect2()
 {
 	int Np = Particle_den.size();
 	Phi_Dir.resize(Np);
@@ -772,54 +673,177 @@ double ParticleScattering::ErrorEstimate()
 	return err1;
 }
 
+
+
 int main() {
 
 
-//	for (int iter = 7; iter < 31; iter++) {
+	// Error and Accuracy tests
 
-		int iter = 33;
-		ParticleScattering test;
-		test.N = iter;
-		test.Np = 10000;
-		test.D = 100.0;
+	int SZ1[4] = {500, 2000, 5000, 20000};
+	int GPs1[10] = {4, 7, 11, 16, 21, 51, 81, 101, 201, 401};
+	int Ns = 4, N_max =10 ;
 
-		test.AllocSize();
-		test.ReadParticle();
-		test.ComputeKernel();
-		test.ComputeDirect2();
+	char filename[50];
 
-		test.FindBucket();
-		test.BucketLambda();
+	for (int siz = 0; siz < Ns; Ns++)
+	{
+		sprintf(filename, "ErrAcc_%d.dat", SZ1[siz]);
 
-		test.ComputeToeplitzUniques();
-		test.ComputeCirculant4fft();
-		test.Gen_zeropadded_X4fft();
-		test.Take_DFT_IDFT();
+		for (int iter = 0; iter < N_max; iter++)
+		{
+			ParticleScattering ACC;
+			ACC.N = GPs1[iter];
+			ACC.Np = SZ1[siz];
+			ACC.D = 100.0;
 
-		test.MapBack2Particles();
+			ACC.AllocSize();
+			ACC.ReadParticle();
+			ACC.ComputeKernel();
 
-		double ER = test.ErrorEstimate();
+			ACC.ComputeDirect();
 
-		printf("--------------------------------------\n");
-		for (int i = 0; i < test.Np; i++)
-			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
+			ACC.FindBucket();
+			ACC.BucketLambda();
 
-		printf("Size = %d\tError = %g\n", iter, ER);
+			ACC.ComputeToeplitzUniques();
+			ACC.ComputeCirculant4fft();
+			ACC.Gen_zeropadded_X4fft();
 
-		test.NearZoneCompute();
+			ACC.Take_DFT_IDFT();
+			ACC.MapBack2Particles();
+			ACC.NearZoneCompute();
 
-		ER = test.ErrorEstimate();
+			double ER = ACC.ErrorEstimate();
 
-		printf("--------------------------------------\n");
-		for (int i = 0; i < test.Np; i++)
-			printf("%g  %g\n", test.Phi_Dir[i], test.Particle_phi[i]);
+			FILE* fp = fopen(filename, "a");
+			fprintf(fp, "%5d, %3.9g, %3.16g\n", (GPs1[iter]-1)*(GPs1[iter]-1), 1.0/(GPs1[iter]-1), ER);
+			fclose(fp);
 
-		printf("Size = %d\tError = %g\n", iter, ER);
+			ACC.DeAllocSize();
+
+		}
+	}
+
+	//////////////////////
+	// Complexity tests //
+	/////////////////////
+
+	int N_sz =16;
+
+	int SZ2[16] = { 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000,
+			200000, 500000, 1000000, 2000000, 5000000, 10000000 };
+	int GPs2[16] = { 4, 6, 8, 11, 15, 24, 33, 46, 72, 101, 143, 235, 317, 448,
+			708, 1001 };
+
+	timespec before, after;
+	timespec time_diff;
+
+	double Time_dir, Time_aim_tot, Time_aim_mv;
+
+	// Timing Direct Method
+	sprintf(filename, "Direct.dat");
+
+	for (int iter = 0; iter < 8; iter++)
+	{
+		ParticleScattering DIR;
+		DIR.N = GPs2[iter];
+		DIR.Np = SZ2[iter];
+		DIR.D = 100.0;
+
+		DIR.AllocSize();
+		DIR.ReadParticle();
+		DIR.ComputeKernel();
+
+		get_time(&before);
+		DIR.ComputeDirect();
+		get_time(&after);
+		diff(&before,&after,&time_diff);
+
+		// Time in seconds
+		Time_dir = time_diff.tv_sec + (double)(time_diff.tv_nsec)/1.0e9;
+
+		get_time(&before);
+		DIR.FindBucket();
+		DIR.BucketLambda();
+
+		DIR.ComputeToeplitzUniques();
+		DIR.ComputeCirculant4fft();
+		DIR.Gen_zeropadded_X4fft();
+		get_time(&after);
+		diff(&before,&after,&time_diff);
+
+		// Time in seconds
+		Time_aim_tot = time_diff.tv_sec + (double)(time_diff.tv_nsec)/1.0e9;
+
+		get_time(&before);
+		DIR.Take_DFT_IDFT();
+		DIR.MapBack2Particles();
+		DIR.NearZoneCompute();
+		get_time(&after);
+		diff(&before,&after,&time_diff);
+
+		// Time in seconds
+		Time_aim_mv = time_diff.tv_sec + (double)(time_diff.tv_nsec)/1.0e9;
+
+		Time_aim_tot += Time_aim_mv;
 
 
-		test.DeAllocSize();
+		FILE* fp = fopen(filename, "a");
+		fprintf(fp, "%d, %3.16g, %3.9g\n", SZ2[iter], 1.0/(GPs2[iter]-1), Time_dir);
+		fclose(fp);
 
-//	}
+
+		DIR.DeAllocSize();
+	}
+
+
+	// Timing AIM
+	sprintf(filename, "Complexity.dat");
+
+	for (int iter = 0; iter < N_sz; iter++)
+	{
+		ParticleScattering CPX;
+		CPX.N = GPs2[iter];
+		CPX.Np = SZ2[iter];
+		CPX.D = 100.0;
+
+		CPX.AllocSize();
+		CPX.ReadParticle();
+
+		get_time(&before);
+		CPX.FindBucket();
+		CPX.BucketLambda();
+
+		CPX.ComputeToeplitzUniques();
+		CPX.ComputeCirculant4fft();
+		CPX.Gen_zeropadded_X4fft();
+		get_time(&after);
+		diff(&before,&after,&time_diff);
+
+		// Time in seconds
+		Time_aim_tot = time_diff.tv_sec + (double)(time_diff.tv_nsec)/1.0e9;
+
+		get_time(&before);
+		CPX.Take_DFT_IDFT();
+		CPX.MapBack2Particles();
+		CPX.NearZoneCompute();
+		get_time(&after);
+		diff(&before,&after,&time_diff);
+
+		// Time in seconds
+		Time_aim_mv = time_diff.tv_sec + (double)(time_diff.tv_nsec)/1.0e9;
+
+		Time_aim_tot += Time_aim_mv;
+
+
+		FILE* fp = fopen(filename, "a");
+		fprintf(fp, "%d, %3.16g, %3.9g, %3.9g\n", SZ2[iter], 1.0/(GPs2[iter]-1), Time_aim_mv, Time_aim_tot);
+		fclose(fp);
+
+
+		CPX.DeAllocSize();
+	}
 
 
 	return 0;

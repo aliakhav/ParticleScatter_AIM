@@ -13,19 +13,12 @@
 
 using namespace std;
 
-// y := alpha*A*x + beta*y
-extern "C" void dgemv_(char* TRANS, const int* M, const int* N, double* alpha,
-		double* A, const int* LDA, double* X, const int* INCX, double* beta,
-		double* Y, const int* INCY);
-
 class ParticleScattering {
 public:
 
 	int N;
 	int Np;
 	double D;
-	double time_dir;
-	double time_dft;
 
 public:
 	std::vector<float> Particle_den;
@@ -81,7 +74,6 @@ public:
 	void AllocSize();
 	void ComputeToeplitzUniques();
 	void ComputeDirect();
-	void ComputeDirect2();
 	void ComputeCirculant4fft();
 	void Gen_zeropadded_X4fft();
 	void Take_DFT_IDFT();
